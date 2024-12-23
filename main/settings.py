@@ -73,6 +73,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_filters",
+    "tinymce",
+
+    # Local apps
+    "user",
+    "product",
 ]
 
 MIDDLEWARE = [
@@ -181,28 +186,31 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_URLS_REGEX = r"(^/media/.*$)|(^/graphql/$)"
-CORS_ALLOW_METHODS = (
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:5173',
 )
+# CORS_ALLOW_METHODS = (
+#     "DELETE",
+#     "GET",
+#     "OPTIONS",
+#     "PATCH",
+#     "POST",
+#     "PUT",
+# )
 
-CORS_ALLOW_HEADERS = (
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-    "sentry-trace",
-)
+# CORS_ALLOW_HEADERS = (
+#     "accept",
+#     "accept-encoding",
+#     "authorization",
+#     "content-type",
+#     "dnt",
+#     "origin",
+#     "user-agent",
+#     "x-csrftoken",
+#     "x-requested-with",
+#     "sentry-trace",
+# )
 
 
 # See if we are inside a test environment (pytest)
@@ -224,7 +232,7 @@ TESTING = (
     or env("PYTEST_XDIST_WORKER") is not None
 )
 
-# AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -238,3 +246,50 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ),
 }
+
+
+TINYMCE_DEFAULT_CONFIG = {
+    "entity_encoding": "raw",
+    "height": 360,
+    "width": 1120,
+    "cleanup_on_startup": True,
+    "custom_undo_redo_levels": 20,
+    "plugins": """
+        anchor autolink charmap code codesample directionality
+        fullscreen image insertdatetime link lists media
+        nonbreaking pagebreak preview save searchreplace table
+        visualblocks visualchars
+        """,
+    "toolbar1": """
+        bold italic underline superscript subscript fontsizeselect
+        | alignleft alignright | aligncenter alignjustify
+        | indent outdent | bullist numlist |
+        | link visualchars charmap image hr nonbreaking | code preview fullscreen
+        """,
+    "paste_data_images": False,
+    "force_p_newlines": True,  # TODO: could be False?
+    "force_br_newlines": True,  # TODO: could be False?
+    "forced_root_block": "",
+    "contextmenu": "formats | link",
+    "menubar": False,
+    "statusbar": False,
+    "invalid_styles": {"*": "opacity"},  # Global invalid style
+    # https://www.tiny.cloud/docs/configure/content-filtering/#invalid_styles
+    # "extended_valid_elements": "iframe[src|frameborder|style|scrolling|class|width|height|name|align]",
+    # If more formatting possibilities needed (or more rows), choose from these:
+    # "toolbar1": """,
+    # fullscreen preview bold italic underline | fontselect,
+    # fontsizeselect  | forecolor backcolor | alignleft alignright |
+    # aligncenter alignjustify | indent outdent | bullist numlist table |
+    # | link image media | codesample |
+    # """,
+    # "toolbar2": """
+    # visualblocks visualchars |
+    # charmap hr pagebreak nonbreaking anchor |  code |
+    # """,
+}
+
+
+# Settings to configure session behavior
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Use the database to store sessions
+SESSION_COOKIE_NAME = 'sessionid'  # The name of the session cookie

@@ -14,9 +14,41 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path as url, include
+from django.conf import settings
+from django.conf.urls.static import static
+from rest_framework.routers import DefaultRouter
+
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+from user import views as user_views
+from product import views as product_views
+
+router = DefaultRouter()
+router.register(r"products", product_views.ProductViewSet, basename="product")
+router.register(r"review", product_views.ReviewViewSet, basename="review")
+router.register(r"cart", product_views.CartViewSet, basename="cart")
+router.register(r"product-category", product_views.ProductCatgeoryViewSet, basename="product-category")
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("api/v1/", include(router.urls)),
+    url(r"^register", user_views.RegistrationView.as_view()),
+    url(r"^change_password", user_views.ChangePasswordView.as_view()),
+    url(r"^change_recover_password", user_views.ChangeRecoverPasswordView.as_view()),
+    url(r"^login", user_views.LoginView.as_view()),
+    path("docs/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path("api-docs/", SpectacularAPIView.as_view(), name="schema"),
+    path("api-docs/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path('api/v1/beer-club/signup/', user_views.beer_club_signup, name='beer_club_signup'),
+    path('api/v1/contact-us/signup/', user_views.contact_message_create, name='contact_message_create'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

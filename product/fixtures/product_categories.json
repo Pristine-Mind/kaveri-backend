@@ -1,0 +1,26 @@
+[
+    {
+        "model": "product.productcategory",
+        "pk": 1,
+        "fields": {
+            "name": "Strong Beer",
+            "description": "Various types of adapters for different devices."
+        }
+    },
+    {
+        "model": "product.productcategory",
+        "pk": 2,
+        "fields": {
+            "name": "Special Edition",
+            "description": "High-speed data cables for multiple devices."
+        }
+    },
+    {
+        "model": "product.productcategory",
+        "pk": 3,
+        "fields": {
+            "name": "Premiem Beer",
+            "description": "Wireless and wired earbuds with great sound quality."
+        }
+    }
+]

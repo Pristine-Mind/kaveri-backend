@@ -32,6 +32,8 @@ uwsgi = "*"
 djangorestframework-simplejwt = "*"
 django-filter = "*"
 pillow = "*"
+django-tinymce = "*"
+drf-spectacular = "*"
 
 [tool.poetry.dev-dependencies]
 dacite = "*"

@@ -8,6 +8,8 @@ from .models import (
     ReviewPhoto,
     Cart,
     CartItem,
+    Shipping,
+    Order,
 )
 
 
@@ -48,16 +50,31 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product_details = ProductSerializer(source='product', read_only=True)
+    product_details = ProductSerializer(source="product", read_only=True)
 
     class Meta:
         model = CartItem
-        fields = '__all__'
+        fields = "__all__"
 
 
 class CartSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(source='cartitem_set', many=True, read_only=True)
+    items = CartItemSerializer(source="cartitem_set", many=True, read_only=True)
 
     class Meta:
         model = Cart
-        fields = ['id', 'session_key', 'user', 'created_at', 'items', 'get_total_price']
+        fields = ["id", "session_key", "user", "created_at", "items", "get_total_price"]
+
+
+class ShippingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shipping
+        fields = "__all__"
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    cart = CartSerializer(read_only=True)
+    shipping = ShippingSerializer(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ["id", "cart", "shipping", "total_price", "delivery_charge", "order_status", "created_at", "updated_at"]

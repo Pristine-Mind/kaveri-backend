@@ -121,10 +121,10 @@ class CustomResponseSerializer(serializers.Serializer):
 class BeerClubMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = BeerClubMember
-        fields = ['id', 'first_name', 'last_name', 'email', 'phone', 'address', 'message', 'created_at']
+        fields = ["id", "first_name", "last_name", "email", "phone", "address", "message", "created_at"]
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
-        fields = ['id', 'name', 'email', 'phone', 'message', 'created_at']
+        fields = ["id", "name", "email", "phone", "message", "created_at"]

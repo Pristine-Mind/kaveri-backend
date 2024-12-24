@@ -7,81 +7,181 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Cart',
+            name="Cart",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('session_key', models.CharField(blank=True, max_length=255, null=True, verbose_name='Session Key')),
-                ('created_at', models.DateTimeField(auto_now=True, verbose_name='Created At')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("session_key", models.CharField(blank=True, max_length=255, null=True, verbose_name="Session Key")),
+                ("created_at", models.DateTimeField(auto_now=True, verbose_name="Created At")),
             ],
         ),
         migrations.CreateModel(
-            name='CartItem',
+            name="CartItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField(default=1, verbose_name='Quantity')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("quantity", models.PositiveIntegerField(default=1, verbose_name="Quantity")),
             ],
         ),
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(help_text='The name of the product.', max_length=255, verbose_name='Product Name')),
-                ('description', models.TextField(help_text='A detailed description of the product.', verbose_name='Description')),
-                ('price', models.DecimalField(decimal_places=2, help_text='The price of the product.', max_digits=10, verbose_name='Price')),
-                ('stock', models.IntegerField(help_text='Available quantity of the product', verbose_name='stock')),
-                ('stock_status', models.BooleanField(default=True, help_text='Indicates if the product is available in stock.', verbose_name='In Stock')),
-                ('image', models.ImageField(help_text='An image of the product.', upload_to='products/', verbose_name='Product Image')),
-                ('featured', models.BooleanField(default=False, help_text='Indicates if the product is featured on the website.', verbose_name='Featured Product')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "name",
+                    models.CharField(help_text="The name of the product.", max_length=255, verbose_name="Product Name"),
+                ),
+                (
+                    "description",
+                    models.TextField(help_text="A detailed description of the product.", verbose_name="Description"),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2, help_text="The price of the product.", max_digits=10, verbose_name="Price"
+                    ),
+                ),
+                ("stock", models.IntegerField(help_text="Available quantity of the product", verbose_name="stock")),
+                (
+                    "stock_status",
+                    models.BooleanField(
+                        default=True, help_text="Indicates if the product is available in stock.", verbose_name="In Stock"
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        help_text="An image of the product.", upload_to="products/", verbose_name="Product Image"
+                    ),
+                ),
+                (
+                    "featured",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Indicates if the product is featured on the website.",
+                        verbose_name="Featured Product",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ProductCategory',
+            name="ProductCategory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(help_text='The name of the product category.', max_length=50, unique=True, verbose_name='Category Name')),
-                ('description', models.TextField(blank=True, help_text='A brief description of the category.', null=True, verbose_name='Category Description')),
-                ('image', models.ImageField(blank=True, help_text='An image representing the category.', null=True, upload_to='category_images/', verbose_name='Category Image')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="The name of the product category.",
+                        max_length=50,
+                        unique=True,
+                        verbose_name="Category Name",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="A brief description of the category.",
+                        null=True,
+                        verbose_name="Category Description",
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        blank=True,
+                        help_text="An image representing the category.",
+                        null=True,
+                        upload_to="category_images/",
+                        verbose_name="Category Image",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Product Category',
-                'verbose_name_plural': 'Product Categories',
+                "verbose_name": "Product Category",
+                "verbose_name_plural": "Product Categories",
             },
         ),
         migrations.CreateModel(
-            name='Review',
+            name="Review",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rating', models.PositiveSmallIntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)], help_text='The rating given to the product (1-5).', verbose_name='Your Rating')),
-                ('review_text', models.TextField(help_text='The text review of the product.', max_length=2000, verbose_name='Review')),
-                ('name', models.CharField(help_text='The name of the reviewer.', max_length=100, verbose_name='Your name')),
-                ('email', models.EmailField(help_text='The email address of the reviewer.', max_length=254, verbose_name='Your email')),
-                ('created_at', models.DateTimeField(auto_now_add=True, help_text='The date and time when the review was created.', verbose_name='Created At')),
-                ('updated_at', models.DateTimeField(auto_now=True, help_text='The date and time when the review was last updated.', verbose_name='Updated At')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "rating",
+                    models.PositiveSmallIntegerField(
+                        choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)],
+                        help_text="The rating given to the product (1-5).",
+                        verbose_name="Your Rating",
+                    ),
+                ),
+                (
+                    "review_text",
+                    models.TextField(help_text="The text review of the product.", max_length=2000, verbose_name="Review"),
+                ),
+                ("name", models.CharField(help_text="The name of the reviewer.", max_length=100, verbose_name="Your name")),
+                (
+                    "email",
+                    models.EmailField(
+                        help_text="The email address of the reviewer.", max_length=254, verbose_name="Your email"
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        help_text="The date and time when the review was created.",
+                        verbose_name="Created At",
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True,
+                        help_text="The date and time when the review was last updated.",
+                        verbose_name="Updated At",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ReviewPhoto',
+            name="ReviewPhoto",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(help_text='The image file for the review photo.', upload_to='review_photos/', verbose_name='Review Photo')),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True, help_text='The date and time when the photo was uploaded.', verbose_name='Uploaded At')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "image",
+                    models.ImageField(
+                        help_text="The image file for the review photo.",
+                        upload_to="review_photos/",
+                        verbose_name="Review Photo",
+                    ),
+                ),
+                (
+                    "uploaded_at",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        help_text="The date and time when the photo was uploaded.",
+                        verbose_name="Uploaded At",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Wishlist',
+            name="Wishlist",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('session_key', models.CharField(blank=True, max_length=255, null=True, verbose_name='Session Key')),
-                ('products', models.ManyToManyField(related_name='wishlists', to='product.product', verbose_name='Products in Wishlist')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("session_key", models.CharField(blank=True, max_length=255, null=True, verbose_name="Session Key")),
+                (
+                    "products",
+                    models.ManyToManyField(
+                        related_name="wishlists", to="product.product", verbose_name="Products in Wishlist"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Wishlist',
-                'verbose_name_plural': 'Wishlists',
+                "verbose_name": "Wishlist",
+                "verbose_name_plural": "Wishlists",
             },
         ),
     ]

@@ -182,11 +182,10 @@ class Wishlist(models.Model):
     """
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='wishlists', null=True, blank=True,
-        verbose_name="User"
+        User, on_delete=models.CASCADE, related_name="wishlists", null=True, blank=True, verbose_name="User"
     )
     session_key = models.CharField(max_length=255, null=True, blank=True, verbose_name="Session Key")
-    products = models.ManyToManyField(Product, related_name='wishlists', verbose_name="Products in Wishlist")
+    products = models.ManyToManyField(Product, related_name="wishlists", verbose_name="Products in Wishlist")
 
     def __str__(self):
         if self.user:
@@ -207,6 +206,7 @@ class Cart(models.Model):
         user (User): The user associated with the cart if logged in.
         created_at (datetime): The date and time when the cart was created.
     """
+
     session_key = models.CharField(max_length=255, blank=True, null=True, verbose_name="Session Key")
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name="User")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Created At")
@@ -236,6 +236,7 @@ class CartItem(models.Model):
         product (Product): The product being added to the cart.
         quantity (int): The quantity of the product being added.
     """
+
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, verbose_name="Cart")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Product")
     quantity = models.PositiveIntegerField(default=1, verbose_name="Quantity")
@@ -251,3 +252,68 @@ class CartItem(models.Model):
             Decimal: The total price for this item.
         """
         return self.product.price * self.quantity
+
+
+class Shipping(models.Model):
+    """
+    Represents the shipping information associated with a cart.
+
+    Attributes:
+        cart (Cart): The cart this shipping information is linked to.
+        first_name (str): The first name of the recipient.
+        last_name (str): The last name of the recipient.
+        email (EmailField): The recipient's email address.
+        phone (str): The recipient's phone number.
+        address (str): The recipient's address.
+        city (str): The city of the shipping address.
+        state (str): The state of the shipping address.
+        postal_code (str): The postal code of the shipping address.
+        country (str): The country of the shipping address.
+        created_at (datetime): The date and time the shipping information was created.
+    """
+
+    cart = models.OneToOneField(Cart, on_delete=models.CASCADE, related_name="shipping", verbose_name="Cart")
+    first_name = models.CharField(max_length=100, verbose_name="First Name")
+    last_name = models.CharField(max_length=100, verbose_name="Last Name")
+    email = models.EmailField(verbose_name="Email Address")
+    phone = models.CharField(max_length=15, verbose_name="Phone Number")
+    address = models.CharField(max_length=255, verbose_name="Address")
+    city = models.CharField(max_length=100, verbose_name="City")
+    state = models.CharField(max_length=100, verbose_name="State")
+    postal_code = models.CharField(max_length=20, verbose_name="Postal Code")
+    country = models.CharField(max_length=100, default="United States", verbose_name="Country")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    def __str__(self):
+        return f"Shipping for Cart #{self.cart.id} - {self.first_name} {self.last_name}"
+
+
+class Order(models.Model):
+    """
+    Represents an order associated with a cart and shipping information.
+
+    Attributes:
+        cart (Cart): The cart linked to the order.
+        shipping (Shipping): The shipping details linked to the order.
+        total_price (Decimal): The total price of the order, including delivery charges.
+        delivery_charge (Decimal): The delivery charge for the order.
+        order_status (str): The status of the order (e.g., Pending, Shipped, Delivered).
+        created_at (datetime): The date and time the order was created.
+        updated_at (datetime): The date and time the order was last updated.
+    """
+
+    cart = models.OneToOneField(Cart, on_delete=models.CASCADE, related_name="order", verbose_name="Cart")
+    shipping = models.OneToOneField(Shipping, on_delete=models.CASCADE, related_name="order", verbose_name="Shipping")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total Price")
+    delivery_charge = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Delivery Charge", default=0.00)
+    order_status = models.CharField(
+        max_length=20,
+        choices=[("Pending", "Pending"), ("Shipped", "Shipped"), ("Delivered", "Delivered")],
+        default="Pending",
+        verbose_name="Order Status",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
+
+    def __str__(self):
+        return f"Order #{self.id} - Cart #{self.cart.id}"

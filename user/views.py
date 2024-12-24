@@ -92,9 +92,9 @@ class ChangePasswordView(views.APIView):
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def beer_club_signup(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         serializer = BeerClubMemberSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -102,9 +102,9 @@ def beer_club_signup(request):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def contact_message_create(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         serializer = ContactMessageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

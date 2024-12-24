@@ -11,43 +11,76 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('product', '0001_initial'),
+        ("product", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='wishlist',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='wishlists', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="wishlist",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="wishlists",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='photos',
-            field=models.ManyToManyField(blank=True, help_text='Optional photos attached to the review.', related_name='reviews', to='product.reviewphoto', verbose_name='Add photos'),
+            model_name="review",
+            name="photos",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Optional photos attached to the review.",
+                related_name="reviews",
+                to="product.reviewphoto",
+                verbose_name="Add photos",
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='product',
-            field=models.ForeignKey(help_text='The product being reviewed.', on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='product.product', verbose_name='Product'),
+            model_name="review",
+            name="product",
+            field=models.ForeignKey(
+                help_text="The product being reviewed.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reviews",
+                to="product.product",
+                verbose_name="Product",
+            ),
         ),
         migrations.AddField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(help_text='The category to which the product belongs.', on_delete=django.db.models.deletion.CASCADE, related_name='products', to='product.productcategory', verbose_name='Category'),
+            model_name="product",
+            name="category",
+            field=models.ForeignKey(
+                help_text="The category to which the product belongs.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="products",
+                to="product.productcategory",
+                verbose_name="Category",
+            ),
         ),
         migrations.AddField(
-            model_name='cartitem',
-            name='cart',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='product.cart', verbose_name='Cart'),
+            model_name="cartitem",
+            name="cart",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="product.cart", verbose_name="Cart"),
         ),
         migrations.AddField(
-            model_name='cartitem',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='product.product', verbose_name='Product'),
+            model_name="cartitem",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="product.product", verbose_name="Product"
+            ),
         ),
         migrations.AddField(
-            model_name='cart',
-            name='user',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="cart",
+            name="user",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
         ),
     ]

@@ -48,6 +48,10 @@ urlpatterns = [
     path("api-docs/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path('api/v1/beer-club/signup/', user_views.beer_club_signup, name='beer_club_signup'),
     path('api/v1/contact-us/signup/', user_views.contact_message_create, name='contact_message_create'),
+    path("api/v1/shipping/", product_views.ShippingView.as_view(), name="shipping"),
+    path("api/v1/shipping/<int:cart_id>/", product_views.ShippingView.as_view(), name="get-shipping"),
+    path("api/v1/order/", product_views.OrderView.as_view(), name="create-order"),
+    path("api/v1/order/<int:order_id>/", product_views.OrderView.as_view(), name="get-order"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

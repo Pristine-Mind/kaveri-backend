@@ -7,13 +7,13 @@ import tinymce.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0002_initial'),
+        ("product", "0002_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='description',
-            field=tinymce.models.HTMLField(help_text='A detailed description of the product.', verbose_name='Description'),
+            model_name="product",
+            name="description",
+            field=tinymce.models.HTMLField(help_text="A detailed description of the product.", verbose_name="Description"),
         ),
     ]

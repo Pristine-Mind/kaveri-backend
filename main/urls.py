@@ -20,7 +20,7 @@ from django.urls import path, re_path as url, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-
+from rest_framework_simplejwt.views import TokenRefreshView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -52,6 +52,9 @@ urlpatterns = [
     path("api/v1/shipping/<int:cart_id>/", product_views.ShippingView.as_view(), name="get-shipping"),
     path("api/v1/order/", product_views.OrderView.as_view(), name="create-order"),
     path("api/v1/order/<int:order_id>/", product_views.OrderView.as_view(), name="get-order"),
+    path('api/token/', user_views.UserLoginView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/profile/', user_views.ProfileView.as_view(), name="profile")
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

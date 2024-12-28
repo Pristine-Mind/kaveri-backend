@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema
-from rest_framework import views, response, status
+from rest_framework import views, response, status, viewsets, permissions, mixins
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 
@@ -16,7 +16,13 @@ from .serializers import (
     ChangePasswordSerializer,
     BeerClubMemberSerializer,
     ContactMessageSerializer,
+    UserSerializer,
 )
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from .models import User
 
 
 def bad_request(message):
@@ -110,3 +116,27 @@ def contact_message_create(request):
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data.update({'user_id': self.user.id, 'email': self.user.email})
+        return data
+
+
+class UserLoginView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class ProfileView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)

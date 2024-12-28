@@ -1,6 +1,7 @@
 from rest_framework import viewsets, response, status, views
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Product, Review, Wishlist, Cart, CartItem, ProductCategory, Shipping, Order
 from .serializers import (
@@ -84,31 +85,41 @@ class CartViewSet(viewsets.ModelViewSet):
 
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.is_authenticated:
-            return Cart.objects.filter(user=self.request.user)
+        user_id = self.request.user.is_authenticated
+        print(user_id, "uuuuu")
+        if user_id:
+            return Cart.objects.filter(user=user_id)
         else:
-            session_key = self.request.session.session_key
-            # print(session_key, "ggggg")
-            # if session_key:
-            #     print(Cart.objects.values_list('session_key', flat=True))
-            #     return Cart.objects.filter(session_key=session_key)
-            return Cart.objects.all()
+            print("hhhhhhhhhhhh")
+            return Cart.objects.none()
+
+        # print(self.request.user)
+        # if self.request.user.is_authenticated:
+        #     print("hreeeeee")
+        #     return Cart.objects.filter(user=self.request.user)
+        # else:
+        #     session_key = self.request.session.session_key
+        #     if session_key:
+        #         return Cart.objects.filter(session_key=session_key)
+        #     return Cart.objects.all()
 
     def get_or_create_cart(self):
         """
         Ensure that a cart is created for the user or session if it doesn't exist.
         """
+        print(self.request.user, )
         if self.request.user.is_authenticated:
             # For authenticated users, associate the cart with the user
             cart, created = Cart.objects.get_or_create(user=self.request.user)
         else:
             # For unauthenticated users, associate the cart with the session key
-            session_key = self.request.session.__dict__
-            print(session_key, "sssss")
+            session_key = self.request.session.session_key
             if not session_key:
                 self.request.session.create()  # Ensure a session is created if not already present
+                session_key = self.request.session.session_key
             cart, created = Cart.objects.get_or_create(session_key=session_key)
         return cart
 
@@ -138,9 +149,12 @@ class CartViewSet(viewsets.ModelViewSet):
         """
         Removes a product from the cart.
         """
-        cart = self.get_object()
-        product = get_object_or_404(Product, id=request.data.get("product_id"))
+        cart = self.get_or_create_cart()
+        product_id = request.data.get("product_id")
+        if not product_id:
+            return response.Response({"error": "product_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+        product = get_object_or_404(Product, id=product_id)
         cart_item = get_object_or_404(CartItem, cart=cart, product=product)
         cart_item.delete()
 
@@ -149,13 +163,16 @@ class CartViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def update_quantity(self, request, pk=None):
         cart = self.get_object()
+        print(cart, "cccccc")
         item_id = request.data.get("item_id")
+        print(item_id, "hhhhhh")
         quantity = request.data.get("quantity")
 
         if quantity <= 0:
             return response.Response({"error": "Quantity must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
 
-        cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+        cart_item = get_object_or_404(CartItem, product=item_id, cart=cart)
+        print(cart_item, "cartitems")
         cart_item.quantity = quantity
         cart_item.save()
 

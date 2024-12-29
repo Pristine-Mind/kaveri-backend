@@ -34,6 +34,7 @@ django-filter = "*"
 pillow = "*"
 django-tinymce = "*"
 drf-spectacular = "*"
+django-anymail = "*"
 
 [tool.poetry.dev-dependencies]
 dacite = "*"

@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "tinymce",
+    "anymail",
 
     # Local apps
     "user",
@@ -291,5 +292,28 @@ TINYMCE_DEFAULT_CONFIG = {
 
 
 # Settings to configure session behavior
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Use the database to store sessions
-SESSION_COOKIE_NAME = 'sessionid'  # The name of the session cookie
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'apikey'
+# EMAIL_HOST_PASSWORD = "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"
+# DEFAULT_FROM_EMAIL = 'nishavseju@gmail.com'
+
+# EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+# SENDGRID_API_KEY = "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"
+# SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+# DEFAULT_FROM_EMAIL = 'nishavseju@gmail.com'
+
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+ANYMAIL = {
+    "BREVO_API_KEY": "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",
+    "TRACKING_OPENS": True,
+    "TRACKING_CLICKS": True,
+}
+
+DEFAULT_FROM_EMAIL = "nishavseju@gmail.com"

@@ -3,15 +3,36 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from .models import User, Recovery, BeerClubMember, ContactMessage
+from .models import User, Recovery, BeerClubMember, ContactMessage, Profile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(required=True, write_only=True)
 
+    business_name = serializers.CharField(required=False, allow_blank=True)
+    business_address = serializers.CharField(required=False, allow_blank=True)
+    business_city = serializers.CharField(required=False, allow_blank=True)
+    business_state = serializers.CharField(required=False, allow_blank=True)
+    business_zip = serializers.CharField(required=False, allow_blank=True)
+    business_phone = serializers.CharField(required=False, allow_blank=True)
+    license_number = serializers.CharField(required=False, allow_blank=True)
+
     class Meta:
         model = User
-        fields = ["email", "first_name", "last_name", "password"]
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            # Profile fields
+            "business_name",
+            "business_address",
+            "business_city",
+            "business_state",
+            "business_zip",
+            "business_phone",
+            "license_number",
+        ]
 
     def validate_password(self, password) -> str:
         validate_password(password)
@@ -24,6 +45,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         with transaction.atomic():
+            # 1. Create the User
             instance = User.objects.create_user(
                 first_name=self.validated_data.get("first_name", ""),
                 last_name=self.validated_data.get("last_name", ""),
@@ -32,6 +54,19 @@ class RegisterSerializer(serializers.ModelSerializer):
                 password=self.validated_data["password"],
                 is_active=True,
             )
+
+            # 2. Create the Profile for the new user
+            Profile.objects.create(
+                user=instance,
+                business_name=self.validated_data.get("business_name", ""),
+                business_address=self.validated_data.get("business_address", ""),
+                business_city=self.validated_data.get("business_city", ""),
+                business_state=self.validated_data.get("business_state", ""),
+                business_zip=self.validated_data.get("business_zip", ""),
+                business_phone=self.validated_data.get("business_phone", ""),
+                license_number=self.validated_data.get("license_number", ""),
+            )
+
             return instance
 
 

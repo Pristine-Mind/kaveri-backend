@@ -13,6 +13,7 @@ class User(AbstractUser):
     full_name = models.CharField(
         verbose_name=_("Full Name"), max_length=512, null=True, blank=True, help_text=_("Full name is auto generated.")
     )
+    is_verified = models.BooleanField(verbose_name=_("Is Verified"), default=False)
     groups = models.ManyToManyField(Group, related_name="raffae_user_groups", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="raffae_user_permissions", blank=True)
 
@@ -25,6 +26,45 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         self.full_name = self.get_full_name()
         return super().save(*args, **kwargs)
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
+        verbose_name="User"
+    )
+    business_name = models.CharField(
+        max_length=255,
+        verbose_name="Business Name"
+    )
+    business_address = models.TextField(
+        verbose_name="Business Address"
+    )
+    business_city = models.CharField(
+        max_length=255,
+        verbose_name="City"
+    )
+    business_state = models.CharField(
+        max_length=2,
+        verbose_name="State (US)",
+        help_text="Use standard 2-letter state code, e.g. CA, NY, TX, etc."
+    )
+    business_zip = models.CharField(
+        max_length=20,
+        verbose_name="ZIP Code"
+    )
+    business_phone = models.CharField(
+        max_length=50,
+        verbose_name="Business Phone"
+    )
+    license_number = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.business_name or f"Profile of {self.user.email}"
 
 
 class Recovery(models.Model):

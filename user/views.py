@@ -55,9 +55,12 @@ class LoginView(views.APIView):
         email = request.data.get("email", None)
         password = request.data.get("password", None)
         user = authenticate(username=email, password=password)
+        print(user)
+        print(user.is_verified)
+        if not user.is_verified:
+            return bad_request("Your aren't verified")
         if user is not None:
             api_key, created = Token.objects.get_or_create(user=user)
-            # Reset the key's created_at time each time we get new credentials
             if not created:
                 api_key.created = timezone.now()
                 api_key.save()
@@ -121,7 +124,7 @@ def contact_message_create(request):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        data.update({'user_id': self.user.id, 'email': self.user.email})
+        data.update({'user_id': self.user.id, 'email': self.user.email, 'is_verified': self.user.is_verified})
         return data
 
 

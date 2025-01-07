@@ -26,15 +26,12 @@ class ProfileInline(admin.StackedInline):
 
 
 class CustomUserAdmin(UserAdmin):
-    # Add the ProfileInline to the User admin
     inlines = (ProfileInline,)
 
-    # Modify the User model fields to include the full_name and is_verified fields
     list_display = ('email', 'username', 'first_name', 'last_name', 'full_name', 'is_verified', 'is_staff', 'is_active')
     search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('email',)
 
-    # Add a fieldset for is_verified
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'full_name')}),
@@ -50,8 +47,21 @@ class CustomUserAdmin(UserAdmin):
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'business_name', 'business_city', 'business_state', 'business_zip', 'created_at', 'updated_at')
-    search_fields = ('business_name', 'user__email', 'business_city', 'business_state')
+    list_display = (
+        'user',
+        'business_name',
+        'business_city',
+        'business_state',
+        'business_zip',
+        'created_at',
+        'updated_at',
+    )
+    search_fields = (
+        'business_name',
+        'user__email',
+        'business_city',
+        'business_state'
+    )
     list_filter = ('business_state',)
 
 

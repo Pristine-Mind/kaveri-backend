@@ -208,14 +208,34 @@ class Cart(models.Model):
     """
 
     session_key = models.CharField(max_length=255, blank=True, null=True, verbose_name="Session Key")
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name="User")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name="User")
     created_at = models.DateTimeField(auto_now=True, verbose_name="Created At")
+    is_order_created = models.BooleanField(default=False, verbose_name="Is order created")
+    free_cases = models.PositiveIntegerField(default=0, verbose_name="Free Cases")  # New field
 
     def __str__(self):
         if self.user:
             return f"Cart of {self.user.username}"
         else:
             return f"Cart for session {self.session_key}"
+
+    def update_free_cases(self):
+        """
+        Updates the free_cases field based on the total quantity of items in the cart:
+          - 25 to 39 total items: 1 free case
+          - 40 to 49 total items: 2 free cases
+          - 50+ total items: 3 free cases
+        """
+        total_quantity = sum(item.quantity for item in self.cartitem_set.all())
+        if total_quantity >= 50:
+            self.free_cases = 3
+        elif total_quantity >= 40:
+            self.free_cases = 2
+        elif total_quantity >= 25:
+            self.free_cases = 1
+        else:
+            self.free_cases = 0
+        self.save(update_fields=["free_cases"])
 
     def get_total_price(self):
         """
@@ -252,6 +272,23 @@ class CartItem(models.Model):
             Decimal: The total price for this item.
         """
         return self.product.price * self.quantity
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to update free_cases on the associated cart after saving.
+        """
+        super().save(*args, **kwargs)
+        # After saving this CartItem, update the cart's free_cases
+        self.cart.update_free_cases()
+
+    def delete(self, *args, **kwargs):
+        """
+        Override delete to update free_cases on the associated cart before deletion.
+        """
+        cart = self.cart
+        super().delete(*args, **kwargs)
+        # After deleting this CartItem, update the cart's free_cases
+        cart.update_free_cases()
 
 
 class Shipping(models.Model):

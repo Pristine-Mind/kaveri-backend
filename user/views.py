@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema
-from rest_framework import views, response, status, viewsets, permissions, mixins
+from rest_framework import views, response, status, viewsets, permissions
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 
@@ -55,8 +55,6 @@ class LoginView(views.APIView):
         email = request.data.get("email", None)
         password = request.data.get("password", None)
         user = authenticate(username=email, password=password)
-        print(user)
-        print(user.is_verified)
         if not user.is_verified:
             return bad_request("Your aren't verified")
         if user is not None:
@@ -124,7 +122,14 @@ def contact_message_create(request):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        data.update({'user_id': self.user.id, 'email': self.user.email, 'is_verified': self.user.is_verified})
+        data.update(
+            {
+                'user_id': self.user.id,
+                'email': self.user.email,
+                'is_verified': self.user.is_verified,
+                'username': self.user.first_name + self.user.last_name,
+            }
+        )
         return data
 
 

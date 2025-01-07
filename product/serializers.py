@@ -62,7 +62,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ["id", "session_key", "user", "created_at", "items", "get_total_price"]
+        fields = ["id", "session_key", "user", "created_at", "items", "get_total_price", "free_cases"]
 
 
 class ShippingSerializer(serializers.ModelSerializer):
@@ -78,3 +78,9 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "cart", "shipping", "total_price", "delivery_charge", "order_status", "created_at", "updated_at"]
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        instance.cart.is_order_created = True
+        instance.cart.save()
+        return instance

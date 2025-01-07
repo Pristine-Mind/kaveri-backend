@@ -83,17 +83,15 @@ class CartViewSet(viewsets.ModelViewSet):
     A viewset for viewing and editing Cart instances.
     """
 
-    queryset = Cart.objects.all()
+    # queryset = Cart.objects.all()
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user_id = self.request.user.is_authenticated
-        print(user_id, "uuuuu")
         if user_id:
-            return Cart.objects.filter(user=user_id)
+            return Cart.objects.filter(user=user_id, is_order_created=False).order_by('-created_at')[:1]
         else:
-            print("hhhhhhhhhhhh")
             return Cart.objects.none()
 
         # print(self.request.user)
@@ -110,10 +108,9 @@ class CartViewSet(viewsets.ModelViewSet):
         """
         Ensure that a cart is created for the user or session if it doesn't exist.
         """
-        print(self.request.user, )
         if self.request.user.is_authenticated:
             # For authenticated users, associate the cart with the user
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            cart, created = Cart.objects.get_or_create(user=self.request.user, is_order_created=False)
         else:
             # For unauthenticated users, associate the cart with the session key
             session_key = self.request.session.session_key
@@ -162,17 +159,14 @@ class CartViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def update_quantity(self, request, pk=None):
-        cart = self.get_object()
-        print(cart, "cccccc")
+        cart = self.get_or_create_cart()
         item_id = request.data.get("item_id")
-        print(item_id, "hhhhhh")
         quantity = request.data.get("quantity")
 
         if quantity <= 0:
             return response.Response({"error": "Quantity must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
 
         cart_item = get_object_or_404(CartItem, product=item_id, cart=cart)
-        print(cart_item, "cartitems")
         cart_item.quantity = quantity
         cart_item.save()
 
@@ -226,6 +220,8 @@ class OrderView(views.APIView):
                 delivery_charge=request.data.get("delivery_charge", 0.0),
                 order_status="Pending",
             )
+            cart.is_order_created = True
+            cart.save()
             serializer = OrderSerializer(order)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 

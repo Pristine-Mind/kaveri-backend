@@ -210,8 +210,8 @@ class OrderView(views.APIView):
         try:
             cart = Cart.objects.get(id=cart_id)
             shipping = Shipping.objects.get(id=shipping_id)
-
-            total_price = cart.get_total_price() + request.data.get("delivery_charge", 0.0)
+            from decimal import Decimal
+            total_price = cart.get_total_price() + Decimal(request.data.get("delivery_charge", 0.0))
 
             order = Order.objects.create(
                 cart=cart,

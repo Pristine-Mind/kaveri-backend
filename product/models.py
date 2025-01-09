@@ -1,4 +1,5 @@
 from typing import Optional
+from decimal import Decimal
 from datetime import datetime
 from tinymce.models import HTMLField
 from django.db import models
@@ -354,3 +355,24 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} - Cart #{self.cart.id}"
+
+    def calculate_delivery_charge(self):
+        """
+        Calculates the delivery charge based on the total quantity of items in the cart.
+          - 0 to 24 items: 19.99
+          - 25+ items: Free delivery
+        """
+        total_quantity = sum(item.quantity for item in self.cart.cartitem_set.all())
+
+        if total_quantity >= 25:
+            self.delivery_charge = 0.00
+        else:
+            self.delivery_charge = 19.99
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to calculate delivery charge before saving the order.
+        """
+        self.calculate_delivery_charge()
+        self.total_price = self.cart.get_total_price() + Decimal(self.delivery_charge)
+        super().save(*args, **kwargs)

@@ -311,9 +311,11 @@ SESSION_COOKIE_NAME = 'sessionid'
 
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 ANYMAIL = {
-    "BREVO_API_KEY": "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",
+    "BREVO_API_KEY": "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",
     "TRACKING_OPENS": True,
     "TRACKING_CLICKS": True,
 }
 
 DEFAULT_FROM_EMAIL = "orders@kaverintl.com"
+
+SECONDARY_FROM_EMAIL = "info@kaverintl.com"

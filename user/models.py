@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class User(AbstractUser):
@@ -24,8 +26,117 @@ class User(AbstractUser):
         return " ".join([name for name in [self.first_name, self.last_name] if name]) or self.email
 
     def save(self, *args, **kwargs):
-        self.full_name = self.get_full_name()
-        return super().save(*args, **kwargs)
+        is_new_verified = self.is_verified and self.pk
+        print(is_new_verified, "nneww")
+
+        if not self.pk:
+            self.full_name = self.get_full_name()
+        super().save(*args, **kwargs)
+        # Send email when is_verified is set to True
+        if is_new_verified:
+            self.send_verification_email()
+
+    def send_verification_email(self):
+
+        subject = "Your Account Has Been Verified"
+
+        # HTML email content
+        message = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Account Verified</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    padding: 20px;
+                    margin: 0;
+                }}
+                .container {{
+                    background-color: #ffffff;
+                    padding: 30px;
+                    border-radius: 10px;
+                    max-width: 600px;
+                    margin: auto;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                }}
+                .header {{
+                    text-align: center;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #e0e0e0;
+                }}
+                .header img {{
+                    max-width: 150px;
+                    height: auto;
+                }}
+                .content {{
+                    padding: 20px 0;
+                    line-height: 1.6;
+                    color: #333333;
+                }}
+                .content h3 {{
+                    color: #d35400;
+                    margin-bottom: 10px;
+                }}
+                .button {{
+                    display: inline-block;
+                    padding: 12px 25px;
+                    margin-top: 20px;
+                    background-color: #d35400;
+                    color: #ffffff !important;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    font-weight: bold;
+                }}
+                .button:hover {{
+                    background-color: #c0392b;
+                }}
+                .footer {{
+                    text-align: center;
+                    padding-top: 20px;
+                    font-size: 12px;
+                    color: #777777;
+                    border-top: 2px solid #e0e0e0;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <img src="https://scontent.fktm8-1.fna.fbcdn.net/v/t39.30808-6/458943246_8181302661977641_4224396525692647175_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=86c6b0&_nc_ohc=rcLWB5Chs4AQ7kNvgEvAi3O&_nc_oc=Adhe4ufQOjdD7pZ0a4FL46WvFrrlvjqEe1FHMtLRS3N7jgyja61k3iP8LsYTQrqDa2U7_K7ahCqT2CfqdawJoxee&_nc_zt=23&_nc_ht=scontent.fktm8-1.fna&_nc_gid=AQ-5THGzniMsI7JlFv5Bng_&oh=00_AYAloihmpiJ2C-YPT5w2YJdtrcGi1iFMEkrdOLwO-SfBdA&oe=677D7D9B" alt="Kaveri International Logo" />
+                </div>
+                <div class="content">
+                    <h2>Congratulations, {self.get_full_name()}!</h2>
+                    <p>We're excited to let you know that your account has been successfully verified.</p>
+                    <p>If you have any questions, feel free to reply to this email or contact our support team at <a href="mailto:info@kaverintl.com">info@kaverintl.com</a>.</p>
+                    <p>We will notify you of any further updates regarding your account.</p>
+                    <p>Best regards,<br>Kaveri InternationalTeam</p>
+                </div>
+                <div class="footer">
+                    <p>&copy; 2024 Kaveri International. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        if self.is_verified:
+            print(f"Sending email from {settings.SECONDARY_FROM_EMAIL}")  # Debugging print
+            from_email = settings.SECONDARY_FROM_EMAIL  # Use info@kaveriintl.com for verification emails
+
+        print(f"From email: {from_email}")  # Debugging print
+        recipient_list = [self.email]
+
+        # Send email with HTML content
+        send_mail(
+            subject,
+            "Your account has been successfully verified.",
+            from_email,
+            recipient_list,
+            html_message=message,  # HTML message
+        )
 
 
 class Profile(models.Model):

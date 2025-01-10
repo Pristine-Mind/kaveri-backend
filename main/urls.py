@@ -39,10 +39,10 @@ router.register(r"product-category", product_views.ProductCatgeoryViewSet, basen
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include(router.urls)),
-    url(r"^register", user_views.RegistrationView.as_view()),
+    url(r"^api/register", user_views.RegistrationView.as_view()),
     url(r"^change_password", user_views.ChangePasswordView.as_view()),
     url(r"^change_recover_password", user_views.ChangeRecoverPasswordView.as_view()),
-    url(r"^login", user_views.LoginView.as_view()),
+    url(r"^api/login", user_views.LoginView.as_view()),
     path("docs/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("api-docs/", SpectacularAPIView.as_view(), name="schema"),
     path("api-docs/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),

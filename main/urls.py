@@ -34,6 +34,7 @@ router.register(r"products", product_views.ProductViewSet, basename="product")
 router.register(r"review", product_views.ReviewViewSet, basename="review")
 router.register(r"cart", product_views.CartViewSet, basename="cart")
 router.register(r"product-category", product_views.ProductCatgeoryViewSet, basename="product-category")
+router.register(r'orders', product_views.OrderReadOnlyViewSet, basename='order')  # Register the readonly viewset
 
 
 urlpatterns = [
@@ -54,7 +55,8 @@ urlpatterns = [
     path("api/v1/order/<int:order_id>/", product_views.OrderView.as_view(), name="get-order"),
     path('api/token/', user_views.UserLoginView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/v1/profile/', user_views.ProfileView.as_view(), name="profile")
+    path('api/v1/profile/', user_views.ProfileView.as_view(), name="profile"),
+    path('api/order-stats/', product_views.OrderStatsView.as_view(), name='order-stats'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

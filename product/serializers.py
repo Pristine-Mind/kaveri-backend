@@ -84,3 +84,10 @@ class OrderSerializer(serializers.ModelSerializer):
         instance.cart.is_order_created = True
         instance.cart.save()
         return instance
+
+
+class OrderStatsSerializer(serializers.Serializer):
+    total_orders = serializers.IntegerField()
+    total_items = serializers.IntegerField()
+    last_week_total_orders_percentage = serializers.FloatField()
+    last_week_total_items_percentage = serializers.FloatField()

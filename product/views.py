@@ -1,6 +1,7 @@
 from rest_framework import viewsets, response, status, views
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from django.db import models
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Product, Review, Wishlist, Cart, CartItem, ProductCategory, Shipping, Order
@@ -13,7 +14,10 @@ from .serializers import (
     ProductCategorySerializer,
     ShippingSerializer,
     OrderSerializer,
+    OrderStatsSerializer
 )
+from datetime import timedelta
+from django.utils import timezone
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
@@ -236,3 +240,61 @@ class OrderView(views.APIView):
             return response.Response(serializer.data, status=status.HTTP_200_OK)
         except Order.DoesNotExist:
             return response.Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class OrderStatsView(views.APIView):
+    """
+    View to retrieve the statistics for total orders, order items, returns orders, and fulfilled orders
+    for the currently logged-in user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        today = timezone.now().date()
+        last_week = today - timedelta(days=7)
+
+        user_orders = Order.objects.filter(cart__user=request.user, created_at__gte=last_week)
+
+        total_orders = user_orders.count()
+        total_items = user_orders.aggregate(total_items=models.Sum('cart__cartitem__quantity'))['total_items'] or 0
+
+        previous_week_start = last_week - timedelta(days=7)
+        previous_week_end = last_week
+        user_orders_last_week = Order.objects.filter(
+            cart__user=request.user, created_at__range=[previous_week_start, previous_week_end]
+        )
+        total_orders_last_week = user_orders_last_week.count()
+        total_items_last_week = user_orders_last_week.aggregate(
+            total_items=models.Sum('cart__cartitem__quantity'))['total_items'] or 0
+
+        def calculate_percentage_change(current, previous):
+            if previous == 0:
+                return 0
+            return ((current - previous) / previous) * 100
+
+        last_week_total_orders_percentage = calculate_percentage_change(total_orders, total_orders_last_week)
+        last_week_total_items_percentage = calculate_percentage_change(total_items, total_items_last_week)
+
+        data = {
+            'total_orders': total_orders,
+            'total_items': total_items,
+            'last_week_total_orders_percentage': last_week_total_orders_percentage,
+            'last_week_total_items_percentage': last_week_total_items_percentage,
+        }
+        serializer = OrderStatsSerializer(data)
+        return response.Response(serializer.data)
+
+
+class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A read-only viewset for viewing orders.
+    """
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Order.objects.all()
+        if self.request.user.is_authenticated:
+            queryset = queryset.filter(cart__user=self.request.user).order_by('-created_at')
+        return queryset

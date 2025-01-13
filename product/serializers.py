@@ -10,6 +10,8 @@ from .models import (
     CartItem,
     Shipping,
     Order,
+    OrderTracking,
+    Payment,
 )
 
 
@@ -91,3 +93,30 @@ class OrderStatsSerializer(serializers.Serializer):
     total_items = serializers.IntegerField()
     last_week_total_orders_percentage = serializers.FloatField()
     last_week_total_items_percentage = serializers.FloatField()
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['id', 'payment_status', 'payment_method', 'payment_date', 'amount', 'transaction_id']
+
+
+class OrderTrackingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderTracking
+        fields = ['id', 'order', 'status', 'updated_at', 'updated_by']
+
+
+class PaymentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['payment_status', 'payment_method', 'payment_date', 'amount', 'transaction_id']
+
+
+# class OrderSerializer(serializers.ModelSerializer):
+#     tracking = OrderTrackingSerializer(many=True, read_only=True)
+#     payment = PaymentSerializer(read_only=True)
+
+#     class Meta:
+#         model = Order
+#         fields = ['id', 'shipping', 'total_price', 'order_status', 'created_at', 'updated_at', 'tracking', 'payment']

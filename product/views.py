@@ -2,9 +2,23 @@ from rest_framework import viewsets, response, status, views
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db import models
+from datetime import timedelta
+from django.utils import timezone
+
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Product, Review, Wishlist, Cart, CartItem, ProductCategory, Shipping, Order
+from .models import (
+    Product,
+    Review,
+    Wishlist,
+    Cart,
+    CartItem,
+    ProductCategory,
+    Shipping,
+    Order,
+    OrderTracking,
+    Payment,
+)
 from .serializers import (
     ProductSerializer,
     ReviewSerializer,
@@ -14,10 +28,11 @@ from .serializers import (
     ProductCategorySerializer,
     ShippingSerializer,
     OrderSerializer,
-    OrderStatsSerializer
+    OrderStatsSerializer,
+    OrderTrackingSerializer,
+    PaymentCreateSerializer,
 )
-from datetime import timedelta
-from django.utils import timezone
+from .email import send_order_status_email, send_payment_success_email
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
@@ -298,3 +313,55 @@ class OrderReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_authenticated:
             queryset = queryset.filter(cart__user=self.request.user).order_by('-created_at')
         return queryset
+
+
+class OrderTrackingViewSet(viewsets.ModelViewSet):
+    queryset = OrderTracking.objects.all()
+    serializer_class = OrderTrackingSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Creates a new tracking entry for an order. This can be used by an admin
+        to update the status of an order.
+        """
+        order_id = request.data.get('order')
+        order = Order.objects.filter(id=order_id).first()
+
+        if not order:
+            return response.Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            send_order_status_email(order)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        """
+        Retrieves the order tracking history for a specific order.
+        """
+        order_id = request.query_params.get('order_id')
+        if not order_id:
+            return response.Response({"error": "Order ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        order = Order.objects.filter(id=order_id).first()
+        if not order:
+            return response.Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        tracking_entries = OrderTracking.objects.filter(order=order)
+        serializer = self.get_serializer(tracking_entries, many=True)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            payment = serializer.save()
+            send_payment_success_email(payment)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

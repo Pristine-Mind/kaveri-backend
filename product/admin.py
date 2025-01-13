@@ -10,6 +10,7 @@ from .models import (
     ReviewPhoto,
     Shipping,
     Order,
+    OrderTracking,
 )
 
 
@@ -138,6 +139,16 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ("id", "cart", "total_price", "delivery_charge", "order_status", "created_at")
     list_filter = ("order_status",)
     search_fields = ("cart__id", "shipping__first_name", "shipping__last_name")
+
+    def save_model(self, request, obj, form, change):
+        if 'order_status' in form.changed_data:
+            # Add tracking record for the status change
+            OrderTracking.objects.create(
+                order=obj,
+                status=obj.order_status,
+                updated_by=request.user.username
+            )
+        super().save_model(request, obj, form, change)
 
 
 admin.site.register(Review, ReviewAdmin)

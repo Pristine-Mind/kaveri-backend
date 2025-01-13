@@ -376,3 +376,79 @@ class Order(models.Model):
         self.calculate_delivery_charge()
         self.total_price = self.cart.get_total_price() + Decimal(self.delivery_charge)
         super().save(*args, **kwargs)
+
+
+class OrderTracking(models.Model):
+    """
+    Represents a tracking entry for an order status update.
+
+    Attributes
+    ----------
+    order : Order
+        The order being tracked.
+    status : str
+        The status of the order (e.g., 'Pending', 'Shipped', 'Delivered').
+    updated_at : datetime
+        The date and time when the order status was updated.
+    updated_by : str
+        The user who updated the status (can be an admin or automated system).
+    """
+
+    class Status(models.TextChoices):
+        PENDING = 'Pending', 'Pending'
+        SHIPPED = 'Shipped', 'Shipped'
+        DELIVERED = 'Delivered', 'Delivered'
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tracking", verbose_name="Order")
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        verbose_name="Order Status",
+    )
+    updated_at = models.DateTimeField(auto_now_add=True, verbose_name="Updated At")
+    updated_by = models.CharField(max_length=100, verbose_name="Updated By")
+
+    def __str__(self):
+        return f"Order #{self.order.id} Status Update: {self.status} by {self.updated_by}"
+
+
+class Payment(models.Model):
+    """
+    Represents a payment for an order.
+
+    Attributes
+    ----------
+    order : Order
+        The order for which payment was made.
+    payment_status : str
+        The status of the payment (e.g., 'Pending', 'Completed', 'Failed').
+    payment_method : str
+        The method of payment (e.g., 'Credit Card', 'PayPal', 'Bank Transfer').
+    payment_date : datetime
+        The date and time the payment was made.
+    amount : Decimal
+        The amount paid.
+    transaction_id : str
+        The transaction ID associated with the payment.
+    """
+
+    class PaymentStatus(models.TextChoices):
+        PENDING = 'Pending', 'Pending'
+        COMPLETED = 'Completed', 'Completed'
+        FAILED = 'Failed', 'Failed'
+
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="payment", verbose_name="Order")
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.PENDING,
+        verbose_name="Payment Status",
+    )
+    payment_method = models.CharField(max_length=50, verbose_name="Payment Method")
+    payment_date = models.DateTimeField(auto_now_add=True, verbose_name="Payment Date")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Amount")
+    transaction_id = models.CharField(max_length=100, verbose_name="Transaction ID")
+
+    def __str__(self):
+        return f"Payment for Order #{self.order.id} - {self.payment_status}"

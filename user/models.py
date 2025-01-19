@@ -26,15 +26,15 @@ class User(AbstractUser):
         return " ".join([name for name in [self.first_name, self.last_name] if name]) or self.email
 
     def save(self, *args, **kwargs):
-        is_new_verified = self.is_verified and self.pk
-        print(is_new_verified, "nneww")
+        # is_new_verified = self.is_verified and self.pk
+        # print(is_new_verified, "nneww")
 
         if not self.pk:
             self.full_name = self.get_full_name()
         super().save(*args, **kwargs)
         # Send email when is_verified is set to True
-        if is_new_verified:
-            self.send_verification_email()
+        # if is_new_verified:
+        #     self.send_verification_email()
 
     def send_verification_email(self):
 

@@ -1,0 +1,74 @@
+[
+  {
+    "model": "product.store",
+    "pk": 1,
+    "fields": {
+      "name": "Hangout Restaurant & Sports Club",
+      "address": "3554 W Airport Fwy, Irving, TX 75062, United States",
+      "link": "https://maps.app.goo.gl/d61MYr5Yo6gvx6ff6"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 2,
+    "fields": {
+      "name": "The Gurkha Bar & Grill",
+      "address": "1060 N Main St #118, Euless, TX 76039, United States",
+      "link": "https://maps.app.goo.gl/aYrV2a8mHgWNYbTA6"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 3,
+    "fields": {
+      "name": "Herbs Indian Cuisine",
+      "address": "Tom Thumb Plaza, 660 Grapevine Hwy, Hurst TX 76054",
+      "link": "https://maps.app.goo.gl/VmyuyetYT6ynGJ3M7"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 4,
+    "fields": {
+      "name": "Hippo Liquor Shop",
+      "address": "3333 Co Rd 119 #6, Hutto, TX 78634, United States",
+      "link": "https://maps.app.goo.gl/ZzsHeqYDCSChRfx4A"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 5,
+    "fields": {
+      "name": "Everest Liquor & Smoke",
+      "address": "1131 E 11th St, Austin, TX 78702, United States",
+      "link": "https://maps.app.goo.gl/5Mkvfq1HKU3JDCK5A"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 6,
+    "fields": {
+      "name": "Cheers Liquor Beer & Wine",
+      "address": "92208 Central Dr, Bedford, TX 76021, United States",
+      "link": "https://maps.app.goo.gl/PbEXWYvLsyFCYWww6"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 7,
+    "fields": {
+      "name": "Central Jatra Sports Bar & Kitchen",
+      "address": "1060 N Main St #118, Euless, TX 76039, United States",
+      "link": "https://maps.app.goo.gl/aYrV2a8mHgWNYbTA6"
+    }
+  },
+  {
+    "model": "product.store",
+    "pk": 8,
+    "fields": {
+      "name": "Purpose Liquor & Smoke",
+      "address": "614 E University Ave, Georgetown, TX 78626, United States",
+      "link": "https://maps.app.goo.gl/AXaVuj2F4NnH6F9a7"
+    }
+  }
+]

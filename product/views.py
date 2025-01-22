@@ -18,6 +18,7 @@ from .models import (
     Order,
     OrderTracking,
     Payment,
+    Store,
 )
 from .serializers import (
     ProductSerializer,
@@ -31,6 +32,7 @@ from .serializers import (
     OrderStatsSerializer,
     OrderTrackingSerializer,
     PaymentCreateSerializer,
+    StoreSerializer,
 )
 from .email import send_order_status_email, send_payment_success_email
 
@@ -365,3 +367,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
             send_payment_success_email(payment)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StoreViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Store.objects.all()  # Query for all stores
+    serializer_class = StoreSerializer  # Use the StoreSerializer

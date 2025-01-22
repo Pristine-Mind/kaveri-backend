@@ -452,3 +452,15 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment for Order #{self.order.id} - {self.payment_status}"
+
+
+class Store(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.TextField()
+    link = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']

@@ -12,6 +12,7 @@ from .models import (
     Order,
     OrderTracking,
     Payment,
+    Store,
 )
 
 
@@ -120,3 +121,9 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Order
 #         fields = ['id', 'shipping', 'total_price', 'order_status', 'created_at', 'updated_at', 'tracking', 'payment']
+
+
+class StoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        fields = ['id', 'name', 'address', 'link'] 

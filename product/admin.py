@@ -11,6 +11,7 @@ from .models import (
     Shipping,
     Order,
     OrderTracking,
+    Store,
 )
 
 
@@ -149,6 +150,12 @@ class OrderAdmin(admin.ModelAdmin):
                 updated_by=request.user.username
             )
         super().save_model(request, obj, form, change)
+
+
+@admin.register(Store)
+class StoreAdmin(admin.ModelAdmin):
+    list_display = ('name', 'address', 'link')
+    search_fields = ('name', 'address')
 
 
 admin.site.register(Review, ReviewAdmin)

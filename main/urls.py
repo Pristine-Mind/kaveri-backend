@@ -34,8 +34,8 @@ router.register(r"products", product_views.ProductViewSet, basename="product")
 router.register(r"review", product_views.ReviewViewSet, basename="review")
 router.register(r"cart", product_views.CartViewSet, basename="cart")
 router.register(r"product-category", product_views.ProductCatgeoryViewSet, basename="product-category")
-router.register(r'orders', product_views.OrderReadOnlyViewSet, basename='order')  # Register the readonly viewset
-
+router.register(r'orders', product_views.OrderReadOnlyViewSet, basename='order')
+router.register(r'stores', product_views.StoreViewSet, basename="store")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
